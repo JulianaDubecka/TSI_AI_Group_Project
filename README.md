@@ -14,6 +14,14 @@ A collaborative AI project developed by UWE Master's students, focusing on desig
 - **Libraries & Frameworks**: PyTorch, pandas, etc.
 - **Development Tools**: Jupyter Notebook, etc.
 
+## **Deployment**
+1. Clone this repository
+2. Create and activate virtual environment *venv*
+3. Install dependencies
+```
+pip install -r requirements.txt
+```
+
 ## **Dataset**
 
 
