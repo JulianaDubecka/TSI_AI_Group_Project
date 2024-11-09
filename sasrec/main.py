@@ -6,6 +6,12 @@ import argparse
 from model import SASRec
 from utils import *
 
+
+device = get_device()
+# Use 'device' wherever tensors are moved to a device, for example:
+# tensor.to(device)
+
+
 def str2bool(s):
     if s not in {'false', 'true'}:
         raise ValueError('Not a valid boolean string')
@@ -106,6 +112,10 @@ if __name__ == '__main__':
             # print("\neye ball check raw_logits:"); print(pos_logits); print(neg_logits) # check pos_logits > 0, neg_logits < 0
             adam_optimizer.zero_grad()
             indices = np.where(pos != 0)
+
+            # Assuming indices is originally a NumPy array
+            indices = torch.tensor(indices, dtype=torch.long, device=device)  # Make sure 'device' is the correct one
+
             loss = bce_criterion(pos_logits[indices], pos_labels[indices])
             loss += bce_criterion(neg_logits[indices], neg_labels[indices])
             for param in model.item_emb.parameters(): loss += args.l2_emb * torch.norm(param)

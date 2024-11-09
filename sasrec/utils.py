@@ -6,6 +6,17 @@ import numpy as np
 from collections import defaultdict
 from multiprocessing import Process, Queue
 
+
+# Add compatibility of Apple Silicon GPU, retaining compatibility with other systems
+def get_device():
+    if torch.backends.mps.is_available():
+        return torch.device("mps")  # Apple Silicon GPU
+    elif torch.cuda.is_available():
+        return torch.device("cuda")  # NVIDIA GPU
+    else:
+        return torch.device("cpu")    # CPU fallback
+
+
 def build_index(dataset_name):
 
     ui_mat = np.loadtxt('data/%s.txt' % dataset_name, dtype=np.int32)
