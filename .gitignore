@@ -10,7 +10,7 @@ data/
 # IDE settings
 .vscode/
 .idea/
-.DS_Store/
+.DS_Store
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
