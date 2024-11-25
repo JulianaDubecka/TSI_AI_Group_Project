@@ -114,7 +114,12 @@ if __name__ == '__main__':
             indices = np.where(pos != 0)
 
             # Assuming indices is originally a NumPy array
-            indices = torch.tensor(indices, dtype=torch.long, device=device)  # Make sure 'device' is the correct one
+            #indices = torch.tensor(indices, dtype=torch.long, device=device)  # Make sure 'device' is the correct one
+
+            # Convert the list of numpy arrays into a single numpy array first
+            indices = np.array(indices)  # Ensures it's a single contiguous array
+            indices = torch.tensor(indices, dtype=torch.long, device=device)  # Convert to tensor
+
 
             loss = bce_criterion(pos_logits[indices], pos_labels[indices])
             loss += bce_criterion(neg_logits[indices], neg_labels[indices])
