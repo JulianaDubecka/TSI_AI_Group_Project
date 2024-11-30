@@ -4,16 +4,18 @@ import torch.nn as nn
 from utils import get_device  # Importing get_device from utils.py
 
 
-device = get_device()
+device = get_device() # Dynamically determine the device (CPU/GPU)
 # Use 'device' wherever tensors are moved to a device, for example:
 # tensor.to(device)
 
 
 class PointWiseFeedForward(torch.nn.Module):
+    """Feedforward layer applied pointwise for Transformer blocks."""
     def __init__(self, hidden_units, dropout_rate):
 
         super(PointWiseFeedForward, self).__init__()
 
+        # Linear transformations with ReLU activation
         self.conv1 = torch.nn.Conv1d(hidden_units, hidden_units, kernel_size=1).to(device)
         self.dropout1 = torch.nn.Dropout(p=dropout_rate).to(device)
         self.relu = torch.nn.ReLU().to(device)
@@ -21,10 +23,15 @@ class PointWiseFeedForward(torch.nn.Module):
         self.dropout2 = torch.nn.Dropout(p=dropout_rate).to(device)
 
     def forward(self, inputs):
+        """
+        Forward pass for pointwise feedforward.
+        Args:
+            inputs: Input tensor (batch_size, seq_length, hidden_units)
+        """
         inputs = inputs.to(device)  # Move inputs to the correct device
         outputs = self.dropout2(self.conv2(self.relu(self.dropout1(self.conv1(inputs.transpose(-1, -2))))))
-        outputs = outputs.transpose(-1, -2) # as Conv1D requires (N, C, Length)
-        outputs += inputs
+        outputs = outputs.transpose(-1, -2) # as Conv1D requires (N, C, Length). Transpose back to original shape
+        outputs += inputs # Residual connection
         return outputs
 
 # pls use the following self-made multihead attention layer
@@ -39,26 +46,30 @@ class SASRec(nn.Module):
         self.item_num = item_num
         self.dev = get_device()  # Use get_device to determine the correct device
 
-        # Embeddings
+        # Embeddings for items and positional indices
         self.item_emb = nn.Embedding(self.item_num + 1, args.hidden_units, padding_idx=0).to(self.dev)
         self.pos_emb = nn.Embedding(args.maxlen + 1, args.hidden_units, padding_idx=0).to(self.dev)
         self.emb_dropout = nn.Dropout(p=args.dropout_rate).to(self.dev)
 
-        # Transformer Layers
+        # Transformer layers (multihead attention + feedforward)
         self.attention_layernorms = nn.ModuleList()
         self.attention_layers = nn.ModuleList()
         self.forward_layernorms = nn.ModuleList()
         self.forward_layers = nn.ModuleList()
 
+        # Final normalization
         self.last_layernorm = nn.LayerNorm(args.hidden_units, eps=1e-8).to(self.dev)
 
+        # Initialize Transformer layers
         for _ in range(args.num_blocks):
+            # Multihead attention
             new_attn_layernorm = nn.LayerNorm(args.hidden_units, eps=1e-8).to(self.dev)
             self.attention_layernorms.append(new_attn_layernorm)
 
             new_attn_layer = nn.MultiheadAttention(args.hidden_units, args.num_heads, args.dropout_rate).to(self.dev)
             self.attention_layers.append(new_attn_layer)
 
+            # Feedforward layer
             new_fwd_layernorm = nn.LayerNorm(args.hidden_units, eps=1e-8).to(self.dev)
             self.forward_layernorms.append(new_fwd_layernorm)
 
@@ -66,42 +77,63 @@ class SASRec(nn.Module):
             self.forward_layers.append(new_fwd_layer)
 
     def log2feats(self, log_seqs):
+        """
+        Generate item embeddings with positional encoding and apply Transformer layers.
+        Args:
+            log_seqs: Input sequence of item IDs (batch_size, seq_length)
+        Returns:
+            log_feats: Feature representation of the sequence
+        """
         # Convert log_seqs to a tensor on the correct device
         if isinstance(log_seqs, np.ndarray):
             log_seqs = torch.tensor(log_seqs, dtype=torch.long, device=self.dev)
         else:
             log_seqs = log_seqs.to(self.dev)
 
-        # Apply item and positional embeddings
+        # Embedding lookup. Apply item and positional embeddings
         seqs = self.item_emb(log_seqs) * (self.item_emb.embedding_dim ** 0.5)
         poss = torch.arange(1, log_seqs.shape[1] + 1, device=self.dev).unsqueeze(0).repeat(log_seqs.shape[0], 1)
         poss = poss * (log_seqs != 0).long()
         seqs += self.pos_emb(poss)
         seqs = self.emb_dropout(seqs)
 
+        # Create attention mask for enforcing causality
         tl = seqs.shape[1]  # Time dimension length for enforce causality
         attention_mask = ~torch.tril(torch.ones((tl, tl), dtype=torch.bool, device=self.dev))
 
+        # Apply Transformer layers
         for i in range(len(self.attention_layers)):
-            seqs = torch.transpose(seqs, 0, 1)
+            seqs = torch.transpose(seqs, 0, 1)  # Transpose for MultiheadAttention
             Q = self.attention_layernorms[i](seqs)
             mha_outputs, _ = self.attention_layers[i](Q, seqs, seqs, attn_mask=attention_mask)
-            seqs = Q + mha_outputs
+            seqs = Q + mha_outputs   # Residual connection
             seqs = torch.transpose(seqs, 0, 1)
 
             seqs = self.forward_layernorms[i](seqs)
             seqs = self.forward_layers[i](seqs)
 
-        log_feats = self.last_layernorm(seqs)  # (U, T, C) -> (U, -1, C)
-
+        log_feats = self.last_layernorm(seqs)  # (U, T, C) -> (U, -1, C). Apply final normalization
         return log_feats
 
     def forward(self, user_ids, log_seqs, pos_seqs, neg_seqs):  # for training
+        """
+        Forward pass for training.
+        Args:
+            user_ids: Batch of user IDs
+            log_seqs: Input sequences
+            pos_seqs: Positive samples
+            neg_seqs: Negative samples
+        Returns:
+            pos_logits: Scores for positive samples
+            neg_logits: Scores for negative samples
+        """
         # Ensure inputs are on the correct device
         if isinstance(user_ids, np.ndarray):
             user_ids = torch.tensor(user_ids, dtype=torch.long, device=self.dev)
         if isinstance(log_seqs, np.ndarray):
             log_seqs = torch.tensor(log_seqs, dtype=torch.long, device=self.dev)
+
+        # Compute logits for positive and negative samples
         if isinstance(pos_seqs, np.ndarray):
             pos_seqs = torch.tensor(pos_seqs, dtype=torch.long, device=self.dev)
         if isinstance(neg_seqs, np.ndarray):
@@ -123,6 +155,15 @@ class SASRec(nn.Module):
         return pos_logits, neg_logits
 
     def predict(self, user_ids, log_seqs, item_indices):  # for inference
+        """
+        Predict scores for a batch of item candidates.
+        Args:
+            user_ids: Batch of user IDs
+            log_seqs: Input sequences
+            item_indices: Candidate items
+        Returns:
+            logits: Scores for the candidate items
+        """
         # Ensure inputs are on the correct device
         if isinstance(user_ids, np.ndarray):
             user_ids = torch.tensor(user_ids, dtype=torch.long, device=self.dev)

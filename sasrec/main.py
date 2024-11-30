@@ -12,43 +12,51 @@ device = get_device()
 # tensor.to(device)
 
 
+# Helper function to parse boolean arguments
 def str2bool(s):
     if s not in {'false', 'true'}:
         raise ValueError('Not a valid boolean string')
     return s == 'true'
 
+# Argument parser for command-line inputs
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', required=True)
 parser.add_argument('--train_dir', required=True)
 parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--lr', default=0.001, type=float)
-parser.add_argument('--maxlen', default=200, type=int)
-parser.add_argument('--hidden_units', default=50, type=int)
-parser.add_argument('--num_blocks', default=2, type=int)
+parser.add_argument('--maxlen', default=200, type=int) # Maximum sequence length
+parser.add_argument('--hidden_units', default=50, type=int) # Embedding size
+parser.add_argument('--num_blocks', default=2, type=int) # Number of Transformer layers
 parser.add_argument('--num_epochs', default=1000, type=int)
-parser.add_argument('--num_heads', default=1, type=int)
+parser.add_argument('--num_heads', default=1, type=int) # Number of attention heads
 parser.add_argument('--dropout_rate', default=0.2, type=float)
-parser.add_argument('--l2_emb', default=0.0, type=float)
+parser.add_argument('--l2_emb', default=0.0, type=float) # Regularization parameter
 parser.add_argument('--device', default='cuda', type=str)
 parser.add_argument('--inference_only', default=False, type=str2bool)
 parser.add_argument('--state_dict_path', default=None, type=str)
 
 args = parser.parse_args()
+
+# Create directory for saving training logs and results
 if not os.path.isdir(args.dataset + '_' + args.train_dir):
     os.makedirs(args.dataset + '_' + args.train_dir)
+
+# Save arguments to a text file
 with open(os.path.join(args.dataset + '_' + args.train_dir, 'args.txt'), 'w') as f:
     f.write('\n'.join([str(k) + ',' + str(v) for k, v in sorted(vars(args).items(), key=lambda x: x[0])]))
 f.close()
 
 if __name__ == '__main__':
-
+    # global dataset
     u2i_index, i2u_index = build_index(args.dataset)
     
-    # global dataset
+    # Prepare dataset
     dataset = data_partition(args.dataset)
 
     [user_train, user_valid, user_test, usernum, itemnum] = dataset
     # num_batch = len(user_train) // args.batch_size # tail? + ((len(user_train) % args.batch_size) != 0)
+
+    # Print dataset statistics
     num_batch = (len(user_train) - 1) // args.batch_size + 1
     cc = 0.0
     for u in user_train:
@@ -57,8 +65,11 @@ if __name__ == '__main__':
     
     f = open(os.path.join(args.dataset + '_' + args.train_dir, 'log.txt'), 'w')
     f.write('epoch (val_ndcg, val_hr) (test_ndcg, test_hr)\n')
-    
+
+    # Initialize sampler for batching
     sampler = WarpSampler(user_train, usernum, itemnum, batch_size=args.batch_size, maxlen=args.maxlen, n_workers=3)
+
+    # Initialize SASRec model
     model = SASRec(usernum, itemnum, args).to(args.device) # no ReLU activation in original SASRec implementation?
     
     for name, param in model.named_parameters():
@@ -72,10 +83,11 @@ if __name__ == '__main__':
 
     # this fails embedding init 'Embedding' object has no attribute 'dim'
     # model.apply(torch.nn.init.xavier_uniform_)
-    
+
     model.train() # enable model training
     
     epoch_start_idx = 1
+
     if args.state_dict_path is not None:
         try:
             model.load_state_dict(torch.load(args.state_dict_path, map_location=torch.device(args.device)))
@@ -98,15 +110,21 @@ if __name__ == '__main__':
     bce_criterion = torch.nn.BCEWithLogitsLoss() # torch.nn.BCELoss()
     adam_optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.98))
 
+    # Track best metrics
     best_val_ndcg, best_val_hr = 0.0, 0.0
     best_test_ndcg, best_test_hr = 0.0, 0.0
     T = 0.0
     t0 = time.time()
+
+    # Training loop
     for epoch in range(epoch_start_idx, args.num_epochs + 1):
         if args.inference_only: break # just to decrease identition
         for step in range(num_batch): # tqdm(range(num_batch), total=num_batch, ncols=70, leave=False, unit='b'):
+            # Sample batch
             u, seq, pos, neg = sampler.next_batch() # tuples to ndarray
             u, seq, pos, neg = np.array(u), np.array(seq), np.array(pos), np.array(neg)
+
+            # Forward pass
             pos_logits, neg_logits = model(u, seq, pos, neg)
             pos_labels, neg_labels = torch.ones(pos_logits.shape, device=args.device), torch.zeros(neg_logits.shape, device=args.device)
             # print("\neye ball check raw_logits:"); print(pos_logits); print(neg_logits) # check pos_logits > 0, neg_logits < 0
@@ -120,14 +138,19 @@ if __name__ == '__main__':
             indices = np.array(indices)  # Ensures it's a single contiguous array
             indices = torch.tensor(indices, dtype=torch.long, device=device)  # Convert to tensor
 
-
+            # Compute loss
             loss = bce_criterion(pos_logits[indices], pos_labels[indices])
             loss += bce_criterion(neg_logits[indices], neg_labels[indices])
+
+            # Regularization
             for param in model.item_emb.parameters(): loss += args.l2_emb * torch.norm(param)
+
+            # Backpropagation
             loss.backward()
             adam_optimizer.step()
             print("loss in epoch {} iteration {}: {}".format(epoch, step, loss.item())) # expected 0.4~0.6 after init few epochs
 
+        # Evaluate model
         if epoch % 20 == 0:
             model.eval()
             t1 = time.time() - t0
