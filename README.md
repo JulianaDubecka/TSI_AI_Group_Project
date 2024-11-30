@@ -16,7 +16,7 @@ A collaborative AI project developed by TSI Master's students, focusing on desig
 
 ## **Requirements**
 - **Operating system:** This project was implemented and tested on MacOS Sequoia 15.1.
-- **Python version:** Python 3.9.2 or above
+- **Python version:** Python 3.11.8 or above
 
 ## **Setting up the environment**
 1. Clone the repository  
@@ -41,7 +41,7 @@ If you don’t have Conda installed, download and install it from [Conda’s off
 If you only have a requirements.txt file (for pip installation):
    1. Create a new Conda environment:
     ```bash
-  conda create --name sasrec_env python=3.9.2
+  conda create --name sasrec_env python=3.11.8
   ```
   2. Activate the environment:
   ```bash
@@ -70,6 +70,17 @@ pip install <package-name>
 
 
 ## **Dataset**
+
+
+## **Model Training**
+
+Copy the dataset to the `sasrec\data` directory in the project root folder.
+
+
+To train the model, run the following command in the terminal (You should be in the `sasrec` directory):
+```bash
+python main.py --dataset=h_m_encoded --train_dir=default --maxlen=50 --dropout_rate=0.2 --device=mps
+```
 
 
 ## **Project Plan**
