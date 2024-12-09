@@ -3,11 +3,12 @@
 A collaborative AI project developed by TSI Master's students, focusing on designing and implementing an AI-based solution to a real-world problem. In groups of three, students design and implement an AI-based solution to tackle a real-world problem. The project involves applying AI techniques like machine learning and data analysis in a functional model, comprehensive report, and final presentation. This repository contains the code, documentation, and resources for our group project.
 
 ## **Topic**
+Evaluation of the self-attentive sequential recommendation model (SASRec) applied on the H&M Personalized Recommendations dataset.
 
 ## **Team Members**
-- **Member 1 Name** – Role / Area of Responsibility
-- **Member 2 Name** – Role / Area of Responsibility
-- **Member 3 Name** – Role / Area of Responsibility
+- **Juliana Dubecka** – Product Owner
+- **[Maksims Noskovs](https://github.com/MaxNoLV)** – Process Expert
+- **[Dmitrijs Poļiščuks](https://github.com/dimdimlv)** – Data Scientist
 
 ## **Tools & Technologies**
 - **Programming Language(s)**: Python, etc.
