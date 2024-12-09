@@ -85,12 +85,10 @@ python main.py --dataset=h_m_encoded --train_dir=default --maxlen=50 --dropout_r
 
 
 ## **Project Plan**
-- **Milestones & Timeline**: []
-  - **Phase 1**: []
-  - **Phase 2**: []
-  - **Phase 3**: []
-  - **Phase 4**: []
-  - **Phase 5**: []
+- **Milestones**: []
+  - **Phase 1**: [EDA & pre-processing]
+  - **Phase 2**: [SASRec model implementation and evaluation]
+  - **Phase 3**: [Project administration]
 
 ## **Implementation**
 []
