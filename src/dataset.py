@@ -51,7 +51,7 @@ def preprocess_transactions(input_csv, output_txt, mapping_txt, min_items=5, max
 
             # Filter and truncate sessions
             for session_id, group in chunk.groupby('session_id'):
-                if min_items <= len(group) <= max_items:
+                if min_items <= len(group):
                     # Add to session_data with truncated items
                     session_data.append(group.tail(max_items))
                     session_counter += 1
