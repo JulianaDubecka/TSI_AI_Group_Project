@@ -91,9 +91,15 @@ python main.py --dataset=h_m_encoded --train_dir=default --maxlen=50 --dropout_r
   - **Phase 3**: [Project administration]
 
 ## **Implementation**
-[]
+We implemented H&M Dataset download and transformation from Kaggle. 
+Unfortunately, it's not possible to share the dataset due to a licence restrictions. However, you can download the dataset from [Kaggle](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations) and transform it using the provided code.
+You need to apply for the H&M competition to get access to the dataset.
 
+We used the PyTorch [SASRec model implementation](https://github.com/pmixer/SASRec.pytorch) and trained it on the H&M dataset.
+We adjusted the model to work also with Apple Silicon GPUs by adding the `device=mps` parameter to the training command.
 ## **Results & Evaluation**
-[]
 
+## **References**
+- [SASRec: Self-Attentive Sequential Recommendation](https://arxiv.org/abs/1808.09781)
+- [SASRec PyTorch Implementation](https://github.com/pmixer/SASRec.pytorch)
 
