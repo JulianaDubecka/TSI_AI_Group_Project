@@ -88,8 +88,8 @@ python main.py --dataset=h_m_encoded --train_dir=default --maxlen=50 --dropout_r
 
 ## **Project Plan**
 - **Milestones**:
-  - **Phase 1**: EDA & pre-processing(notebooks/eda.ipynb)
-  - **Phase 2**: SASRec model implementation and evaluation(logs_visualizations)
+  - **Phase 1**: [EDA & pre-processing](https://github.com/JulianaDubecka/TSI_AI_Group_Project/blob/main/notebooks/eda.ipynb)
+  - **Phase 2**: SASRec model [implementation](https://github.com/pmixer/SASRec.pytorch) and [evaluation](https://github.com/JulianaDubecka/TSI_AI_Group_Project/tree/main/logs_visualizations)
   - **Phase 3**: Project administration
 
 ## **Implementation**
