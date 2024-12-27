@@ -96,6 +96,8 @@ Unfortunately, it's not possible to share the dataset due to a licence restricti
 You need to apply for the H&M competition to get access to the dataset.
 
 We used the PyTorch [SASRec model implementation](https://github.com/pmixer/SASRec.pytorch) and trained it on the H&M dataset.
+The package is distributed under the Apache 2.0 license.
+
 We adjusted the model to work also with Apple Silicon GPUs by adding the `device=mps` parameter to the training command.
 ## **Results & Evaluation**
 
