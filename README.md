@@ -3,7 +3,7 @@
 A collaborative AI project developed by TSI Master's students, focusing on designing and implementing an AI-based solution to a real-world problem in group of three. The project involves applying AI techniques like machine learning and data analysis in a functional model, report, and final presentation. This repository contains the code, documentation, and resources for our group project.
 
 ## **Topic**
-Evaluation of the self-attentive sequential recommendation model (SASRec) applied on the H&M Personalized Recommendations dataset.
+Evaluation of the Self-Attentive Sequential Recommendation model (SASRec) applied on the H&M Personalized Recommendations dataset.
 
 ## **Team Members**
 - **Juliana Dubecka** – Product Owner
@@ -13,11 +13,13 @@ Evaluation of the self-attentive sequential recommendation model (SASRec) applie
 ## **Tools & Technologies**
 - **Programming Language(s)**: Python, etc.
 - **Libraries & Frameworks**: PyTorch, pandas, etc.
-- **Development Tools**: Jupyter Notebook, etc.
+- **Development Tools**: Jupyter Notebook, Visual Studio Code, etc.
 
 ## **Requirements**
 - **Operating system:** This project was implemented and tested on MacOS Sequoia 15.1.
 - **Python version:** Python 3.11.8 or above
+- [environment.yml](https://github.com/JulianaDubecka/TSI_AI_Group_Project/blob/main/environment.yml)
+- [requirements.txt](https://github.com/JulianaDubecka/TSI_AI_Group_Project/blob/main/requirements.txt)
 
 ## **Setting up the environment**
 1. Clone the repository  
@@ -28,6 +30,7 @@ cd TSI_AI_Group_Project
 ```
 2. Install Conda (If Not Already Installed)  
 If you don’t have Conda installed, download and install it from [Conda’s official website](https://anaconda.org/anaconda/conda).
+
 3. Create the Conda Environment  
 - **Using the environment.yml File**
    1. Create the environment using the `environment.yml` file:
@@ -71,7 +74,12 @@ pip install <package-name>
 
 
 ## **Dataset**
-We implemented H&M Dataset download and transformation from Kaggle. 
+We implemented H&M Dataset download and transformation from Kaggle.</br>
+
+Size of the Dataset: 3.49 GB</br>
+Number of rows: 31,788,324</br>
+Number of features: 5</br>
+
 Unfortunately, it's not possible to share the dataset due to a licence restrictions. However, you can download the dataset from [Kaggle](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations) and transform it using the provided code.
 You need to apply for the H&M competition to get access to the dataset.
 
@@ -88,8 +96,8 @@ python main.py --dataset=h_m_encoded --train_dir=default --maxlen=50 --dropout_r
 
 ## **Project Plan**
 - **Milestones**:
-  - **Phase 1**: [EDA & pre-processing](https://github.com/JulianaDubecka/TSI_AI_Group_Project/blob/main/notebooks/eda.ipynb)
-  - **Phase 2**: SASRec model [implementation](https://github.com/pmixer/SASRec.pytorch) and [evaluation](https://github.com/JulianaDubecka/TSI_AI_Group_Project/tree/main/logs_visualizations)
+  - **Phase 1**: [EDA & pre-processing](https://github.com/JulianaDubecka/TSI_AI_Group_Project/blob/main/Deliverables%20%26%20Artefacts/Exploratory%20Data%20Analysis.pdf)
+  - **Phase 2**: SASRec model [implementation](https://github.com/pmixer/SASRec.pytorch) and [evaluation](https://github.com/JulianaDubecka/TSI_AI_Group_Project/blob/main/Deliverables%20%26%20Artefacts/Model%20performance%20report.pdf)
   - **Phase 3**: Project administration
 
 ## **Implementation**
@@ -98,8 +106,12 @@ The package is distributed under the Apache 2.0 license.
 
 We adjusted the model to work also with Apple Silicon GPUs by adding the `device=mps` parameter to the training command.
 ## **Results & Evaluation**
+- [Model performance report](https://github.com/JulianaDubecka/TSI_AI_Group_Project/blob/main/Deliverables%20%26%20Artefacts/Model%20performance%20report.pdf)
+- [Logs](https://github.com/JulianaDubecka/TSI_AI_Group_Project/tree/main/logs_visualizations/logs)
+- [Plots](https://github.com/JulianaDubecka/TSI_AI_Group_Project/tree/main/logs_visualizations/plots)
 
 ## **References**
+- [Literature database](https://www.zotero.org/groups/5808339/sasrec_model)
 - [SASRec: Self-Attentive Sequential Recommendation](https://arxiv.org/abs/1808.09781)
 - [SASRec PyTorch Implementation](https://github.com/pmixer/SASRec.pytorch)
 
