@@ -16,4 +16,4 @@ data/
 .ipynb_checkpoints/
 
 # Kaggle API key
-kaggle.json
+kaggle.json.DS_Store
