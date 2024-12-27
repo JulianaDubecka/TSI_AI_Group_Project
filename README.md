@@ -1,6 +1,6 @@
 # TSI AI Group Project
 
-A collaborative AI project developed by TSI Master's students, focusing on designing and implementing an AI-based solution to a real-world problem. In groups of three, students design and implement an AI-based solution to tackle a real-world problem. The project involves applying AI techniques like machine learning and data analysis in a functional model, comprehensive report, and final presentation. This repository contains the code, documentation, and resources for our group project.
+A collaborative AI project developed by TSI Master's students, focusing on designing and implementing an AI-based solution to a real-world problem in group of three. The project involves applying AI techniques like machine learning and data analysis in a functional model, report, and final presentation. This repository contains the code, documentation, and resources for our group project.
 
 ## **Topic**
 Evaluation of the self-attentive sequential recommendation model (SASRec) applied on the H&M Personalized Recommendations dataset.
@@ -71,7 +71,9 @@ pip install <package-name>
 
 
 ## **Dataset**
-
+We implemented H&M Dataset download and transformation from Kaggle. 
+Unfortunately, it's not possible to share the dataset due to a licence restrictions. However, you can download the dataset from [Kaggle](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations) and transform it using the provided code.
+You need to apply for the H&M competition to get access to the dataset.
 
 ## **Model Training**
 
@@ -86,15 +88,11 @@ python main.py --dataset=h_m_encoded --train_dir=default --maxlen=50 --dropout_r
 
 ## **Project Plan**
 - **Milestones**:
-  - **Phase 1**: [EDA & pre-processing]
-  - **Phase 2**: [SASRec model implementation and evaluation]
-  - **Phase 3**: [Project administration]
+  - **Phase 1**: EDA & pre-processing(notebooks/eda.ipynb)
+  - **Phase 2**: SASRec model implementation and evaluation(logs_visualizations)
+  - **Phase 3**: Project administration
 
 ## **Implementation**
-We implemented H&M Dataset download and transformation from Kaggle. 
-Unfortunately, it's not possible to share the dataset due to a licence restrictions. However, you can download the dataset from [Kaggle](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations) and transform it using the provided code.
-You need to apply for the H&M competition to get access to the dataset.
-
 We used the PyTorch [SASRec model implementation](https://github.com/pmixer/SASRec.pytorch) and trained it on the H&M dataset.
 The package is distributed under the Apache 2.0 license.
 
