@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from logs_utils import preprocess_data_to_dataframe
 
 
-file_path = "1-log_1000epo_50emb_0.001.txt"
+file_path = "/logs_visualizations/logs/1-log_1000epo_50emb_0.001.txt"
 df = preprocess_data_to_dataframe(file_path)
 
 
