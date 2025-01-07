@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from logs_utils import preprocess_data_to_dataframe
 
 
-file_path = "/logs_visualizations/logs/1-log_1000epo_50emb_0.001.txt"
+file_path = "/logs/fullset_log_500epo_0.0001lr_10emb.txt"
 df = preprocess_data_to_dataframe(file_path)
 
 
@@ -83,6 +83,6 @@ plt.text(
     horizontalalignment="right",
 )
 
-plt.savefig("../logs/plots/plot_1.png", dpi=300)
+plt.savefig("../logs_visualizations/plots/plot_9_emb10.png", dpi=300)
 
 # plt.show()
